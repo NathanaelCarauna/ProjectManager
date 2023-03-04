@@ -19,7 +19,7 @@ public interface CrudController {
 
 	Task create(Task task);
 
-	Task update(Task task);
+	Task update(long id, Task task);
 
 	void deleteById(long id);
 

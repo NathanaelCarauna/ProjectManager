@@ -51,14 +51,14 @@ public class TaskController implements CrudController {
 	@PostMapping
 	public Task create(@RequestBody Task task) {
 		logger.info(String.format("Create new task called. Task: %s", task));
-		return taskService.save(task);
+		return taskService.create(task);
 	}
 	
 	@Override
 	@PutMapping("/{id}")
-	public Task update(@RequestBody Task task) {
+	public Task update(@PathVariable long id, @RequestBody Task task) {
 		logger.info(String.format("Update task called. Task: %s", task));
-		return taskService.save(task);
+		return taskService.update(id, task);
 	}
 	
 	@Override

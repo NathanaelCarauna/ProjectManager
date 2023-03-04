@@ -10,7 +10,9 @@ public interface CrudService {
 
 	Task findById(long id);
 
-	Task save(Task task);
+	Task create(Task task);
+	
+	Task update(long id, Task task);
 
 	void deleteById(long id);
 

@@ -1,6 +1,7 @@
 package com.carauna.projectmanager.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -19,6 +20,9 @@ import org.junit.jupiter.api.Test;
 import com.carauna.projectmanager.domain.model.Task;
 import com.carauna.projectmanager.repository.TaskRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.ServletException;
+
 class TaskServiceImplTest {
 
 	private CrudService taskCrudService;
@@ -36,7 +40,9 @@ class TaskServiceImplTest {
 		taskList.add(taskCreate);
 		when(taskRepository.findAll()).thenReturn(taskList);
 		when(taskRepository.findById(1l)).thenReturn(Optional.of(taskId));
-		when(taskRepository.save(any(Task.class))).thenReturn(taskCreate);		
+		when(taskRepository.existsById(1l)).thenReturn(true);
+		when(taskRepository.existsById(0l)).thenReturn(false);
+		when(taskRepository.save(any(Task.class))).thenReturn(taskCreate);
 		taskCrudService = new TaskServiceImpl(taskRepository);
 	}
 	
@@ -51,13 +57,32 @@ class TaskServiceImplTest {
 	}
 	
 	@Test
-	void saveTest() {
-		assertEquals("createTest", taskCrudService.save(new Task("createTest", false)).getTitle());
+	void createTest() {
+		assertEquals("createTest", taskCrudService.create(new Task("createTest", false)).getTitle());
+	}
+	
+	@Test
+	void updateTest() {
+		assertEquals("createTest", taskCrudService.update(1, new Task("createTest", false)).getTitle());
+	}
+	
+	@Test
+	void updateNotFoundTest() {
+		Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+			taskCrudService.update(0, new Task("createTest", false));
+		});		
 	}
 	
 	@Test
 	void deleteTest() {
-		taskCrudService.deleteById(0);
+		taskCrudService.deleteById(1);
+	}
+	
+	@Test
+	void deleteNotFoundTest() {
+		Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+			taskCrudService.deleteById(0);
+		});
 	}
 
 }

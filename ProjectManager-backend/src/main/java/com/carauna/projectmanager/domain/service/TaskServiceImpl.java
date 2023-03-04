@@ -32,12 +32,27 @@ public class TaskServiceImpl implements CrudService {
 	}
 	
 	@Override
-	public Task save(Task task) {
+	public Task create(Task task) {
 		return taskRepository.save(task);
 	}
 	
 	@Override
+	public Task update(long id, Task task) {
+		checkIfExistsOrThrowsNotFoundException(id);
+		
+		task.setId(id);
+		return taskRepository.save(task);
+	}	
+	
+	@Override
 	public void deleteById(long id) {
+		checkIfExistsOrThrowsNotFoundException(id);
 		taskRepository.deleteById(id);
+	}
+	
+	private void checkIfExistsOrThrowsNotFoundException(long id) {
+		if(!taskRepository.existsById(id)) {
+			throw new EntityNotFoundException(String.format("Task with id %d doesn't exists", id ));
+		}
 	}
 }

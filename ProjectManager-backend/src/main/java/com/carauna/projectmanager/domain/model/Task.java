@@ -1,6 +1,5 @@
 package com.carauna.projectmanager.domain.model;
 
-
 import java.util.Objects;
 
 import jakarta.persistence.Entity;
@@ -16,7 +15,7 @@ public class Task {
 	private long id;
 	private String title;
 	private boolean completed;
-		
+
 	public Task() {
 	}
 
@@ -25,13 +24,15 @@ public class Task {
 		this.title = title;
 		this.completed = completed;
 	}
-	
-	
 
 	public Task(long id, String title, boolean completed) {
 		this.id = id;
 		this.title = title;
 		this.completed = completed;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public long getId() {
@@ -67,7 +68,5 @@ public class Task {
 		Task other = (Task) obj;
 		return Objects.equals(id, other.id);
 	}
-	
-	
-	
+
 }
