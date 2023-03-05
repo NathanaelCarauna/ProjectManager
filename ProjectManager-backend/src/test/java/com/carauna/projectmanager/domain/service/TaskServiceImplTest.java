@@ -3,17 +3,13 @@ package com.carauna.projectmanager.domain.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.util.Arrays;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +17,6 @@ import com.carauna.projectmanager.domain.model.Task;
 import com.carauna.projectmanager.repository.TaskRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.ServletException;
 
 class TaskServiceImplTest {
 
@@ -68,7 +63,7 @@ class TaskServiceImplTest {
 	
 	@Test
 	void updateNotFoundTest() {
-		Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			taskCrudService.update(0, new Task("createTest", false));
 		});		
 	}
@@ -80,7 +75,7 @@ class TaskServiceImplTest {
 	
 	@Test
 	void deleteNotFoundTest() {
-		Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			taskCrudService.deleteById(0);
 		});
 	}

@@ -1,7 +1,7 @@
 package com.carauna.projectmanager.api.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
@@ -12,13 +12,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.carauna.projectmanager.domain.model.Task;
-import com.carauna.projectmanager.exceptionhandler.ApiErrorResponse;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.ServletException;
 
 class TaskControllerTest extends AbstractTest {
 
