@@ -2,7 +2,7 @@
 	"plantumlVersion": "latest",
 	"projectName": "ProjectManager-Doc",
 	"homepageName": "Introduction",
-	"rootFolder": "src",
+	"rootFolder": "Documentation_src",
 	"distFolder": "docs",
 	"generateMD": true,
 	"generatePDF": false,
