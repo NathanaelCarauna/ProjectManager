@@ -86,35 +86,35 @@ class TaskControllerTest extends AbstractTest {
 		assertEquals(expectedResult, taskResponse.getTitle());
 		assertTrue(taskResponse.isCompleted());
 	}
-	
+
 	@Test
 	void createTaskWithEmptyTitleThrowsExceptionTest() throws Exception {
 		String emptyStr = "";
-		Exception exception = assertThrows(ServletException.class, () -> {
-			CreateTask(emptyStr, true);
-		});
-		String expectedMessage = "Request processing failed: org.springframework.transaction.TransactionSystemException: Could not commit JPA transaction";
-		assertEquals(expectedMessage, exception.getMessage());
+		
+		MvcResult mvcResult = CreateTask(emptyStr, true);
+		int status = mvcResult.getResponse().getStatus();		
+		
+		assertEquals(400, status);
 	}
-	
+
 	@Test
-	void createTaskWithTooSmallTitleThrowsExceptionTest() throws Exception {
+	void createTaskWithTSmallerThan3ThrowsExceptionTest() throws Exception {
 		String emptyStr = "as";
-		Exception exception = assertThrows(ServletException.class, () -> {
-			CreateTask(emptyStr, true);
-		});
-		String expectedMessage = "Request processing failed: org.springframework.transaction.TransactionSystemException: Could not commit JPA transaction";
-		assertEquals(expectedMessage, exception.getMessage());
+		
+		MvcResult mvcResult = CreateTask(emptyStr, true);
+		int status = mvcResult.getResponse().getStatus();		
+		
+		assertEquals(400, status);
 	}
-	
+
 	@Test
-	void createTaskWithTooBigTitleThrowsExceptionTest() throws Exception {
+	void createTaskWithTitleBiggerThan100ThrowsExceptionTest() throws Exception {
 		String emptyStr = "asasdasdasdasdasdasdasdasdfasdf asdf asdf sadf asdf asdf sadfasdfasdfasdfasdf asdfa sdfasdfa sdfasd fasdfasdfasdfas";
-		Exception exception = assertThrows(ServletException.class, () -> {
-			CreateTask(emptyStr, true);
-		});
-		String expectedMessage = "Request processing failed: org.springframework.transaction.TransactionSystemException: Could not commit JPA transaction";
-		assertEquals(expectedMessage, exception.getMessage());
+		
+		MvcResult mvcResult = CreateTask(emptyStr, true);
+		int status = mvcResult.getResponse().getStatus();		
+		
+		assertEquals(400, status);
 	}
 
 	@Test
@@ -125,7 +125,7 @@ class TaskControllerTest extends AbstractTest {
 
 		Task task = new Task(resultTaskEntity.getId(), expectedResult, true);
 		MvcResult mvcResult = updateTask(task, resultTaskEntity.getId());
-		
+
 		int status = mvcResult.getResponse().getStatus();
 		Task taskEntityFromResult = getTaskEntityFromResult(mvcResult);
 		deleteTask(resultTaskEntity.getId());
@@ -133,18 +133,51 @@ class TaskControllerTest extends AbstractTest {
 		assertEquals(200, status);
 		assertEquals(expectedResult, taskEntityFromResult.getTitle());
 	}
+	
+	@Test
+	void updateTaskWithEmptyTitleThrowsExceptionTest() throws Exception {
+		String emptyStr = "";
+		Task task = new Task(emptyStr, true);
+		
+		MvcResult mvcResult = updateTask(task, 0);
+		int status = mvcResult.getResponse().getStatus();		
+		
+		assertEquals(400, status);
+	}
+
+	@Test
+	void updateTaskWithTitleSmallerThan3ThrowsExceptionTest() throws Exception {
+		String emptyStr = "as";
+		Task task = new Task(emptyStr, true);
+		
+		MvcResult mvcResult = updateTask(task, 0);
+		int status = mvcResult.getResponse().getStatus();		
+		
+		assertEquals(400, status);
+	}
+
+	@Test
+	void updateTaskWithBiggerThan100ThrowsExceptionTest() throws Exception {
+		String emptyStr = "asasdasdasdasdasdasdasdasdfasdf asdf asdf sadf asdf asdf sadfasdfasdfasdfasdf asdfa sdfasdfa sdfasd fasdfasdfasdfas";
+		Task task = new Task(emptyStr, true);
+		
+		MvcResult mvcResult = updateTask(task, 0);
+		int status = mvcResult.getResponse().getStatus();		
+		
+		assertEquals(400, status);
+	}
 
 	@Test
 	void deleteTaskWithValidIdTest() throws Exception {
-		MvcResult createTaskResult = CreateTask("asd", false);		
+		MvcResult createTaskResult = CreateTask("asd", false);
 		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
-		
+
 		MvcResult mvcResult = deleteTask(resultTaskEntity.getId());
 		int status = mvcResult.getResponse().getStatus();
-		
+
 		assertEquals(200, status);
 	}
-	
+
 	@Test
 	void deleteTaskWithInvalidIdThrowsNotFoundExceptionTest() throws Exception {
 		Exception exception = assertThrows(ServletException.class, () -> {

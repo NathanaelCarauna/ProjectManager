@@ -18,6 +18,8 @@ import com.carauna.projectmanager.domain.model.Task;
 import com.carauna.projectmanager.domain.service.CrudService;
 import com.carauna.projectmanager.domain.service.TaskServiceImpl;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/task")
 public class TaskController implements CrudController {
@@ -49,14 +51,14 @@ public class TaskController implements CrudController {
 	
 	@Override
 	@PostMapping
-	public Task create(@RequestBody Task task) {
+	public Task create(@Valid @RequestBody Task task) {
 		logger.info(String.format("Create new task called. Task: %s", task));
 		return taskService.create(task);
 	}
 	
 	@Override
 	@PutMapping("/{id}")
-	public Task update(@PathVariable long id, @RequestBody Task task) {
+	public Task update(@PathVariable long id, @Valid @RequestBody Task task) {
 		logger.info(String.format("Update task called. Task: %s", task));
 		return taskService.update(id, task);
 	}
