@@ -29,7 +29,7 @@ class TaskControllerTest extends AbstractTest {
 	}
 
 	@Test
-	void findAllTest() throws Exception {
+	void findAllReturnTaskListTest() throws Exception {
 		MvcResult createTaskResult = CreateTask("testFindAll", false);
 		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
 		String uri = "/api/task";
@@ -46,7 +46,7 @@ class TaskControllerTest extends AbstractTest {
 	}
 
 	@Test
-	void findByIdNotFoundTest() throws Exception {
+	void findByIncorrectIdThrowsNotFoundExceptionTest() throws Exception {
 		long id = 0;
 		String uri = "/api/task/" + id;
 
@@ -59,7 +59,7 @@ class TaskControllerTest extends AbstractTest {
 	}
 
 	@Test
-	void findByIdTest() throws Exception {
+	void findByCorrectIdIsSuccessTest() throws Exception {
 		expectedResult = "testFindById";
 		MvcResult createTaskResult = CreateTask(expectedResult, false);
 		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
@@ -73,7 +73,7 @@ class TaskControllerTest extends AbstractTest {
 	}
 
 	@Test
-	void createTaskTest() throws Exception {
+	void createTaskWithValidTitleTest() throws Exception {
 		expectedResult = "CreateTest";
 		MvcResult mvcResult = CreateTask(expectedResult, true);
 
@@ -86,9 +86,39 @@ class TaskControllerTest extends AbstractTest {
 		assertEquals(expectedResult, taskResponse.getTitle());
 		assertTrue(taskResponse.isCompleted());
 	}
+	
+	@Test
+	void createTaskWithEmptyTitleThrowsExceptionTest() throws Exception {
+		String emptyStr = "";
+		Exception exception = assertThrows(ServletException.class, () -> {
+			CreateTask(emptyStr, true);
+		});
+		String expectedMessage = "Request processing failed: org.springframework.transaction.TransactionSystemException: Could not commit JPA transaction";
+		assertEquals(expectedMessage, exception.getMessage());
+	}
+	
+	@Test
+	void createTaskWithTooSmallTitleThrowsExceptionTest() throws Exception {
+		String emptyStr = "as";
+		Exception exception = assertThrows(ServletException.class, () -> {
+			CreateTask(emptyStr, true);
+		});
+		String expectedMessage = "Request processing failed: org.springframework.transaction.TransactionSystemException: Could not commit JPA transaction";
+		assertEquals(expectedMessage, exception.getMessage());
+	}
+	
+	@Test
+	void createTaskWithTooBigTitleThrowsExceptionTest() throws Exception {
+		String emptyStr = "asasdasdasdasdasdasdasdasdfasdf asdf asdf sadf asdf asdf sadfasdfasdfasdfasdf asdfa sdfasdfa sdfasd fasdfasdfasdfas";
+		Exception exception = assertThrows(ServletException.class, () -> {
+			CreateTask(emptyStr, true);
+		});
+		String expectedMessage = "Request processing failed: org.springframework.transaction.TransactionSystemException: Could not commit JPA transaction";
+		assertEquals(expectedMessage, exception.getMessage());
+	}
 
 	@Test
-	void updateTaskTest() throws Exception {
+	void updateTaskWithValidFieldsTest() throws Exception {
 		expectedResult = "updateTest";
 		MvcResult createTaskResult = CreateTask("asd", false);
 		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
@@ -105,7 +135,7 @@ class TaskControllerTest extends AbstractTest {
 	}
 
 	@Test
-	void deleteTaskTest() throws Exception {
+	void deleteTaskWithValidIdTest() throws Exception {
 		MvcResult createTaskResult = CreateTask("asd", false);		
 		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
 		
@@ -116,7 +146,7 @@ class TaskControllerTest extends AbstractTest {
 	}
 	
 	@Test
-	void deleteTaskNotFoundTest() throws Exception {
+	void deleteTaskWithInvalidIdThrowsNotFoundExceptionTest() throws Exception {
 		Exception exception = assertThrows(ServletException.class, () -> {
 			deleteTask(0);
 		});
