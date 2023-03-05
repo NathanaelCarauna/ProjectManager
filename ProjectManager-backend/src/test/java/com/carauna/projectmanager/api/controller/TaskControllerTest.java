@@ -1,6 +1,9 @@
 package com.carauna.projectmanager.api.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+
+import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,11 +12,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.carauna.projectmanager.domain.model.Task;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
 
 class TaskControllerTest extends AbstractTest {
+
+	String expectedResult;
 
 	@BeforeEach
 	void tearUp() {
@@ -22,74 +30,137 @@ class TaskControllerTest extends AbstractTest {
 
 	@Test
 	void findAllTest() throws Exception {
+		MvcResult createTaskResult = CreateTask("testFindAll", false);
+		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
 		String uri = "/api/task";
+
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).accept(MediaType.APPLICATION_JSON_VALUE))
 				.andReturn();
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
 		String content = mvcResult.getResponse().getContentAsString();
 		Task[] taskList = super.mapFromJson(content, Task[].class);
+		deleteTask(resultTaskEntity.getId());
+
+		assertEquals(200, status);
 		assertTrue(taskList.length > 0);
 	}
 
 	@Test
-	void findByIdTest() throws Exception {
-		String uri = "/api/task/2";
+	void findByIdNotFoundTest() throws Exception {
+		long id = 0;
+		String uri = "/api/task/" + id;
 
 		Exception exception = assertThrows(ServletException.class, () -> {
-			MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).accept(MediaType.APPLICATION_JSON_VALUE))
-					.andReturn();
+			findById(uri);
 		});
+
 		String expectedMessage = "Request processing failed: jakarta.persistence.EntityNotFoundException";
 		assertEquals(expectedMessage, exception.getMessage());
 	}
 
 	@Test
+	void findByIdTest() throws Exception {
+		expectedResult = "testFindById";
+		MvcResult createTaskResult = CreateTask(expectedResult, false);
+		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
+		String uri = "/api/task/" + resultTaskEntity.getId();
+
+		MvcResult findByIdResult = findById(uri);
+		Task taskEntityFromResult = getTaskEntityFromResult(findByIdResult);
+		deleteTask(resultTaskEntity.getId());
+
+		assertEquals("testFindById", taskEntityFromResult.getTitle());
+	}
+
+	@Test
 	void createTaskTest() throws Exception {
+		expectedResult = "CreateTest";
+		MvcResult mvcResult = CreateTask(expectedResult, true);
+
+		int status = mvcResult.getResponse().getStatus();
+		String content = mvcResult.getResponse().getContentAsString();
+		Task taskResponse = super.mapFromJson(content, Task.class);
+		deleteTask(taskResponse.getId());
+
+		assertEquals(200, status);
+		assertEquals(expectedResult, taskResponse.getTitle());
+		assertTrue(taskResponse.isCompleted());
+	}
+
+	@Test
+	void updateTaskTest() throws Exception {
+		expectedResult = "updateTest";
+		MvcResult createTaskResult = CreateTask("asd", false);
+		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
+
+		Task task = new Task(resultTaskEntity.getId(), expectedResult, true);
+		MvcResult mvcResult = updateTask(task, resultTaskEntity.getId());
+		
+		int status = mvcResult.getResponse().getStatus();
+		Task taskEntityFromResult = getTaskEntityFromResult(mvcResult);
+		deleteTask(resultTaskEntity.getId());
+
+		assertEquals(200, status);
+		assertEquals(expectedResult, taskEntityFromResult.getTitle());
+	}
+
+	@Test
+	void deleteTaskTest() throws Exception {
+		MvcResult createTaskResult = CreateTask("asd", false);		
+		Task resultTaskEntity = getTaskEntityFromResult(createTaskResult);
+		
+		MvcResult mvcResult = deleteTask(resultTaskEntity.getId());
+		int status = mvcResult.getResponse().getStatus();
+		
+		assertEquals(200, status);
+	}
+	
+	@Test
+	void deleteTaskNotFoundTest() throws Exception {
+		Exception exception = assertThrows(ServletException.class, () -> {
+			deleteTask(0);
+		});
+		String expectedMessage = "Request processing failed: jakarta.persistence.EntityNotFoundException: Task with id 0 doesn't exists";
+		assertEquals(expectedMessage, exception.getMessage());
+	}
+
+	private MvcResult findById(String uri) throws Exception {
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).accept(MediaType.APPLICATION_JSON_VALUE))
+				.andReturn();
+		return mvcResult;
+	}
+
+	private MvcResult updateTask(Task task, long id) throws JsonProcessingException, Exception {
+		String uri = "/api/task/" + id;
+		String inputJson = super.mapToJson(task);
+		MvcResult mvcResult = mvc.perform(
+				MockMvcRequestBuilders.put(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson))
+				.andReturn();
+		return mvcResult;
+	}
+
+	private MvcResult deleteTask(long id) throws Exception {
+		String uri = "/api/task/" + id;
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)).andReturn();
+		return mvcResult;
+	}
+
+	private Task getTaskEntityFromResult(MvcResult mvcResult)
+			throws JsonParseException, JsonMappingException, IOException {
+		String content = mvcResult.getResponse().getContentAsString();
+		Task taskResponse = super.mapFromJson(content, Task.class);
+		return taskResponse;
+	}
+
+	private MvcResult CreateTask(String title, boolean completed) throws JsonProcessingException, Exception {
 		String uri = "/api/task";
-		Task task = new Task("title", true);
+		Task task = new Task(title, completed);
 
 		String inputJson = super.mapToJson(task);
 		MvcResult mvcResult = mvc.perform(
 				MockMvcRequestBuilders.post(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson))
 				.andReturn();
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		String content = mvcResult.getResponse().getContentAsString();
-		Task taskResponse = super.mapFromJson(content, Task.class);
-		assertTrue(taskResponse.getId() > 0);
-	}
-
-	@Test
-	void updateTaskTest() throws Exception {
-		String uri = "/api/task/2";
-		Task task = new Task(2, "title2", true);
-
-		String inputJson = super.mapToJson(task);
-		MvcResult mvcResult = mvc.perform(
-				MockMvcRequestBuilders.put(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson))
-				.andReturn();
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-		String content = mvcResult.getResponse().getContentAsString();
-		Task taskResponse = super.mapFromJson(content, Task.class);
-		assertTrue(taskResponse.getTitle().equals("title2"));
-	}
-
-	@Test
-	void deleteTaskTest() throws Exception {
-		String uri = "/api/task/2";
-		Task task = new Task(2, "title2", true);
-
-		String inputJson = super.mapToJson(task);
-		MvcResult mvcResult = mvc.perform(
-				MockMvcRequestBuilders.delete(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(inputJson))
-				.andReturn();
-		int status = mvcResult.getResponse().getStatus();
-		assertEquals(200, status);
-//		String content = mvcResult.getResponse().getContentAsString();
-//		Task taskResponse = super.mapFromJson(content, Task.class);
-//		assertTrue(taskResponse.getTitle().equals("title2"));
+		return mvcResult;
 	}
 
 }
