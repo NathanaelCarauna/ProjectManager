@@ -1,27 +1,18 @@
 package com.carauna.projectmanager.domain.model;
 
-import java.util.Objects;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Entity
-public class Task {
+public class Task extends AbstractEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
-	
 	@NotBlank
 	@Size(max = 100, min = 3)
 	private String title;
-	
+
 	private boolean completed;
-	
+
 	public Task() {
 	}
 
@@ -32,17 +23,9 @@ public class Task {
 	}
 
 	public Task(long id, String title, boolean completed) {
-		this.id = id;
+		this.setId(id);
 		this.title = title;
 		this.completed = completed;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public long getId() {
-		return id;
 	}
 
 	public String getTitle() {
@@ -55,24 +38,7 @@ public class Task {
 
 	@Override
 	public String toString() {
-		return "Task [id=" + id + ", title=" + title + ", completed=" + completed + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Task other = (Task) obj;
-		return Objects.equals(id, other.id);
+		return "Task [id=" + getId() + ", title=" + title + ", completed=" + completed + "]";
 	}
 
 }

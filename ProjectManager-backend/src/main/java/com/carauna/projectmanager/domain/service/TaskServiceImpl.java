@@ -1,8 +1,8 @@
 package com.carauna.projectmanager.domain.service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.carauna.projectmanager.domain.model.Task;
@@ -33,13 +33,14 @@ public class TaskServiceImpl implements CrudService {
 
 	@Override
 	public Task create(Task task) {
+		task.setCreationDateTime(OffsetDateTime.now());
 		return taskRepository.save(task);
 	}
 
 	@Override
 	public Task update(long id, Task task) {
 		checkIfExistsOrThrowsNotFoundException(id);
-
+		task.setLastModifiedDateTime(OffsetDateTime.now());
 		task.setId(id);
 		return taskRepository.save(task);
 	}
