@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.carauna.projectmanager.domain.model.Task;
+import com.carauna.projectmanager.exceptionhandler.ApiErrorResponse;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -50,12 +51,18 @@ class TaskControllerTest extends AbstractTest {
 		long id = 0;
 		String uri = "/api/task/" + id;
 
-		Exception exception = assertThrows(ServletException.class, () -> {
-			findById(uri);
-		});
-
-		String expectedMessage = "Request processing failed: jakarta.persistence.EntityNotFoundException";
-		assertEquals(expectedMessage, exception.getMessage());
+		MvcResult findByIdResult = findById(uri);
+		int status = findByIdResult.getResponse().getStatus();
+		String content = findByIdResult.getResponse().getContentAsString();
+		
+		String expectedStatus = "{\"status\":400,";
+		String expectedTimeStamp = "\"timeStamp\":";
+		String expectedTitle = "\"title\":\"Task with id 0 doesn't exists\"";
+		
+		assertEquals(400, status);
+		assertTrue(content.contains(expectedStatus));
+		assertTrue(content.contains(expectedTimeStamp));
+		assertTrue(content.contains(expectedTitle));
 	}
 
 	@Test
@@ -66,9 +73,11 @@ class TaskControllerTest extends AbstractTest {
 		String uri = "/api/task/" + resultTaskEntity.getId();
 
 		MvcResult findByIdResult = findById(uri);
-		Task taskEntityFromResult = getTaskEntityFromResult(findByIdResult);
+		int status = findByIdResult.getResponse().getStatus();
+		Task taskEntityFromResult = getTaskEntityFromResult(findByIdResult);		
 		deleteTask(resultTaskEntity.getId());
-
+		
+		assertEquals(200, status);
 		assertEquals("testFindById", taskEntityFromResult.getTitle());
 	}
 
@@ -140,9 +149,19 @@ class TaskControllerTest extends AbstractTest {
 		Task task = new Task(emptyStr, true);
 		
 		MvcResult mvcResult = updateTask(task, 0);
-		int status = mvcResult.getResponse().getStatus();		
+		int status = mvcResult.getResponse().getStatus();
+		String content = mvcResult.getResponse().getContentAsString();
+		
+		String expectedStatus = "{\"status\":400,";
+		String expectedTimeStamp = "\"timeStamp\":";
+		String expectedTitle = "\"title\":\"One or more fields are invalid. Correct the fields and try again\"";
+		String fields = "\"fields\":[";
 		
 		assertEquals(400, status);
+		assertTrue(content.contains(expectedStatus));
+		assertTrue(content.contains(expectedTimeStamp));
+		assertTrue(content.contains(expectedTitle));
+		assertTrue(content.contains(fields));
 	}
 
 	@Test
@@ -151,9 +170,19 @@ class TaskControllerTest extends AbstractTest {
 		Task task = new Task(emptyStr, true);
 		
 		MvcResult mvcResult = updateTask(task, 0);
-		int status = mvcResult.getResponse().getStatus();		
+		int status = mvcResult.getResponse().getStatus();
+		String content = mvcResult.getResponse().getContentAsString();
+		
+		String expectedStatus = "{\"status\":400,";
+		String expectedTimeStamp = "\"timeStamp\":";
+		String expectedTitle = "\"title\":\"One or more fields are invalid. Correct the fields and try again\"";
+		String fields = "\"fields\":[";
 		
 		assertEquals(400, status);
+		assertTrue(content.contains(expectedStatus));
+		assertTrue(content.contains(expectedTimeStamp));
+		assertTrue(content.contains(expectedTitle));
+		assertTrue(content.contains(fields));
 	}
 
 	@Test
@@ -180,11 +209,18 @@ class TaskControllerTest extends AbstractTest {
 
 	@Test
 	void deleteTaskWithInvalidIdThrowsNotFoundExceptionTest() throws Exception {
-		Exception exception = assertThrows(ServletException.class, () -> {
-			deleteTask(0);
-		});
-		String expectedMessage = "Request processing failed: jakarta.persistence.EntityNotFoundException: Task with id 0 doesn't exists";
-		assertEquals(expectedMessage, exception.getMessage());
+		MvcResult findByIdResult = deleteTask(0);
+		int status = findByIdResult.getResponse().getStatus();
+		String content = findByIdResult.getResponse().getContentAsString();
+		
+		String expectedStatus = "{\"status\":400,";
+		String expectedTimeStamp = "\"timeStamp\":";
+		String expectedTitle = "\"title\":\"Task with id 0 doesn't exists\"";
+		
+		assertEquals(400, status);
+		assertTrue(content.contains(expectedStatus));
+		assertTrue(content.contains(expectedTimeStamp));
+		assertTrue(content.contains(expectedTitle));
 	}
 
 	private MvcResult findById(String uri) throws Exception {

@@ -10,6 +10,7 @@ import com.carauna.projectmanager.repository.TaskRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
+
 @Service
 public class TaskServiceImpl implements CrudService {
 
@@ -28,7 +29,8 @@ public class TaskServiceImpl implements CrudService {
 	
 	@Override
 	public Task findById(long id) {
-		return taskRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+		checkIfExistsOrThrowsNotFoundException(id);
+		return taskRepository.findById(id).get();
 	}
 	
 	@Override
