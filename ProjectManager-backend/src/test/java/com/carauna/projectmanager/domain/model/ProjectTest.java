@@ -2,7 +2,7 @@ package com.carauna.projectmanager.domain.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +24,8 @@ class ProjectTest {
 		ArrayList<Task> tasks = new ArrayList<Task>();
 		tasks.add(new Task());
 		project.setTasks(tasks);
-		project.setCreationDateTime(OffsetDateTime.now());
-		project.setLastModifiedDateTime(OffsetDateTime.now());
+		project.setCreationDateTime(LocalDateTime.now());
+		project.setLastModifiedDateTime(LocalDateTime.now());
 	}
 
 	

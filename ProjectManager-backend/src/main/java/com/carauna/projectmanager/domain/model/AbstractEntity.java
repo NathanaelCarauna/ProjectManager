@@ -1,6 +1,6 @@
 package com.carauna.projectmanager.domain.model;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import jakarta.persistence.GeneratedValue;
@@ -14,8 +14,8 @@ public abstract class AbstractEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
-	private OffsetDateTime creationDateTime;
-	private OffsetDateTime lastModifiedDateTime;
+	private LocalDateTime creationDateTime;
+	private LocalDateTime lastModifiedDateTime;
 
 	public long getId() {
 		return id;
@@ -25,19 +25,19 @@ public abstract class AbstractEntity {
 		this.id = id;
 	}
 
-	public OffsetDateTime getCreationDateTime() {
+	public LocalDateTime getCreationDateTime() {
 		return creationDateTime;
 	}
 
-	public void setCreationDateTime(OffsetDateTime creationDateTime) {
+	public void setCreationDateTime(LocalDateTime creationDateTime) {
 		this.creationDateTime = creationDateTime;
 	}
 
-	public OffsetDateTime getLastModifiedDateTime() {
+	public LocalDateTime getLastModifiedDateTime() {
 		return lastModifiedDateTime;
 	}
 
-	public void setLastModifiedDateTime(OffsetDateTime lastModifiedDateTime) {
+	public void setLastModifiedDateTime(LocalDateTime lastModifiedDateTime) {
 		this.lastModifiedDateTime = lastModifiedDateTime;
 	}
 

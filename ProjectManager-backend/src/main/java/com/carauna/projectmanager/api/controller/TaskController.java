@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.carauna.projectmanager.domain.model.Task;
@@ -51,6 +53,7 @@ public class TaskController implements CrudController {
 	
 	@Override
 	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
 	public Task create(@Valid @RequestBody Task task) {
 		logger.info(String.format("Create new task called. Task: %s", task));
 		return taskService.create(task);
@@ -65,6 +68,7 @@ public class TaskController implements CrudController {
 	
 	@Override
 	@DeleteMapping("{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteById(@PathVariable long id) {
 		logger.info(String.format("Delete task by id called. Id: %s", id));
 		taskService.deleteById(id);

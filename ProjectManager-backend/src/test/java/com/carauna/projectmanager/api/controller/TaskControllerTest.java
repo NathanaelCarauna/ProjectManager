@@ -87,7 +87,7 @@ class TaskControllerTest extends AbstractTest {
 		Task taskResponse = super.mapFromJson(content, Task.class);
 		deleteTask(taskResponse.getId());
 
-		assertEquals(200, status);
+		assertEquals(201, status);
 		assertEquals(expectedResult, taskResponse.getTitle());
 		assertTrue(taskResponse.isCompleted());
 	}
@@ -200,7 +200,7 @@ class TaskControllerTest extends AbstractTest {
 		MvcResult mvcResult = deleteTask(resultTaskEntity.getId());
 		int status = mvcResult.getResponse().getStatus();
 
-		assertEquals(200, status);
+		assertEquals(204, status);
 	}
 
 	@Test
