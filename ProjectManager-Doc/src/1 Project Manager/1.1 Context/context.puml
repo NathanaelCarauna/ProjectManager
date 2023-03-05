@@ -1,15 +1,20 @@
 @startuml
 !include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
 LAYOUT_WITH_LEGEND()
+LAYOUT_TOP_DOWN()
 
-Person(pbc, "Personal Banking Customer", "A customer of the bank, with personal bank accounts.")
-System(ibs, "Internet Banking System", "Allows customers to view information about their bank accounts, and make payments.")
-System_Ext(es, "E-mail system", "The internal Microsoft Exchange e-mail system.")
-System_Ext(mbs, "Mainframe Banking System", "Stores all of the core banking information about customers, accounts, transactions, etc.")
+Person(devActor, "Developer", "")
+Person(managerActor, "Project Manager", "")
+System(systemApp, "ProjectManager System", "Allows managers and developers to manage, view and keep track of projects.")
+System_Ext(emailSystem, "E-mail system", "E-mail system not defined yet")
 
-Rel(pbc, ibs, "Uses")
-Rel(es, pbc, "Sends e-mails to")
-Rel(ibs, es, "Sends e-mails", "SMTP")
-Rel(ibs, mbs, "Uses")
+Rel(devActor, systemApp, "Uses")
+Rel(managerActor, systemApp, "Uses")
+Rel(emailSystem, devActor, "Sends e-mails to")
+Rel(emailSystem, managerActor, "Sends e-mails to")
+Rel(systemApp, emailSystem, "Sends e-mails", "SMTP")
 @enduml
+
+//TODO Resaech and define e-mail system
